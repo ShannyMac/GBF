@@ -14,7 +14,7 @@
 .container {background-color: #D2B48C}
 
 .inputbox{
-	width: 100%;
+	width: 80%;
 	height: 30px;
 }
 
@@ -52,13 +52,7 @@
   	width: 80%;
   }
 
-  .btn-lg {
-  	-webkit-transform: rotate(45deg);
-  	border-color: #009916;
-  	width: 50%;
-  	margin: auto;
-
-  }
+  
 
   .dropdown {
 

@@ -26,41 +26,23 @@
         <div class= "col-xs-2 visit">
           <p>Channels</p>
 
-      <div class="dropdown">
-        <button class="btn btn-default dropdown-toggle open" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-    Fields
-    <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-    <li><a href="http://www.leaguelineup.com/location.asp?url=gbwsl&locationid=1315301&sid=555180320">South</a></li>
-    <li><a href="#">Radio Club</a></li>
-    <li><a href="#">Hub Field/a></li>
-    <li><a href="#">McKay's Corner</a></li>
-  </ul>
-</div>
-           <div type="diamond" class="diamond">
-             <!--<p>South</p>-->
-<div class="media">
-  <div class="media-left">
-    <a href="http://images.clipartpanda.com/baseball-field-clipart-yTkbGyATE.png">
-      <img src="http://images.clipartpanda.com/baseball-field-clipart-yTkbGyATE.png"/>
-    </a>
-  </div>
-</div>
-           </div>
+          <p>Users</p>
+          <div id="namesDiv"></div>
+
+          <!--These are my channel buttons!-->
+
+     <button type="button" class="btn btn-success btn-block" onclick="channel('general')">General</button>
+     <button type="button" class="btn btn-success btn-block" onclick="channel('south')">South</button>
+     <button type="button" class="btn btn-success btn-block" onclick="channel('radioclub')">Radio Club</button>
+     <button type="button" class="btn btn-success btn-block" onclick="channel('hub')">Hub</button>
 
         </div>
         <div class= "col-xs-10">
-        <div class= "fields"><p>Summertime Softball</p></div>
          <div class="row">
-          <div class="col-xs-10">
               <div id='messagesDiv' class="messages"></div>
           </div>
        <!-- Some problem here! -->
-          <div class="col-xs-2">
-            <button type="button" class="btn btn-warning btn-custom" onclick=logout()>Logout</button>
-              
-          </div>
+          
          </div>
    
            <input type='text' id='messageInput' class="inputbox" placeholder='Message' />
@@ -68,7 +50,7 @@
       </div>
     </div>
 
-
+      <div><a href="javascript:logout();">Logout</a></div>
     
 
     <div class="modal fade" id="auth-modal">
@@ -76,7 +58,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title text-center">Who Goes There?</h4>
+        <h4 class="modal-title text-center">Authenticate</h4>
       </div>
       <div class="modal-body text-center">
         <div class="row">
@@ -107,49 +89,177 @@
       var myDataRef = new Firebase('https://gbfields.firebaseio.com/');
       var name= "";
       var authModal = $('#auth-modal').modal( {show: false }); //we don't want the modal to show immediately
-
+      var curField = "general";
 
        // Create a callback which logs the current auth state
-       function authDataCallback(authData) {
-        if (authData) {
-        console.log("User " + authData.uid + " is logged in with " + authData.provider);
+       //want to check to see if user is alread logged in; this is with a getAuth func.
 
-          var userId = authData.id;
+       var authData = myDataRef.getAuth();
+
+       if (authData){
+        var userId = authData.uid;
           name = authData[authData.provider].displayName;
-      } else {
-        console.log("User is logged out");
-      }
-      }
-      // Register the callback to be fired every time auth state changes
-      
-      myDataRef.onAuth(authDataCallback);
-
-      $('#messageInput').keypress(function (e) {
-        if (e.keyCode == 13) {
-          //check to see if user is logged in?
-          if(!name){
-            authModal.modal('show');
-          } else { //don't submit anything unless we know the user's name!
-          //var name = $('#nameInput').val();
-          var text = $('#messageInput').val();
-          myDataRef.push({name: name, text: text});
-          $('#messageInput').val('');
-                 }
-        }
-      }); 
+          console.log("user is already logged in");
+       }
 
        
-
       function login(provider){
         console.log("login with ", provider);
         authModal.modal('hide');
         myDataRef.authWithOAuthPopup(provider, function(error, authData) {
          if (error) {
-         console.log("Login Failed!", error);
+          console.log("Login Failed!", error);
          } else {
-         console.log("Authenticated successfully with payload:", authData);
-      }
-       });
+          console.log("Authenticated successfully with payload:", authData);
+          //console.log("User " + authData.uid + " is logged in with " + authData.provider);
+
+          var userId = authData.uid;
+          name = authData[authData.provider].displayName;
+          myDataRef.child('user').child(userId).once("value", function(snapshot){
+             var ifExists = snapshot.exists(); //a firebase function
+
+             if (ifExists){
+                console.log('user is already in the system');
+              }  else {
+                myDataRef.child('user').child(userId).push({id: userId, name:name});
+              }
+             })
+             }
+          });
+        }
+      
+        myDataRef.child('user').on('value', function(snapshot){
+          var allNames = snapshot.val();
+           //console.log(allNames);
+           for (var u in allNames) {
+             for(var i in allNames[u]){
+              console.log(allNames[u][i].name);
+              displayNamesUser(allNames[u][i].name)
+             }
+              
+           }
+        })
+
+        //This is my channel function!! Each field (ball field) is a child of my set of channels. Rob used curField to specify that text should be inputted only into the channel Im typing into
+
+        function channel(field){
+          console.log('we are currently in channel', field);
+          curField = field;
+          $('#messagesDiv').html('');
+          myDataRef.child('channel').child(curField).off('child_added');
+          myDataRef.child('channel').child(curField).on('child_added', function(snapshot) {
+        var message = snapshot.val();
+        console.log(message);
+        displayChatMessage(message.name, message.text);
+      });
+        }
+
+        //Check out where the message input is changed! For instance, curField is a new child in there.
+
+        $('#messageInput').keypress(function (e) {
+            if (e.keyCode == 13) {
+            //check to see if user is logged in?
+              if(!name){
+                authModal.modal('show');
+              } else { //don't submit anything unless we know the user's name!
+              //var name = $('#nameInput').val();
+              var text = $('#messageInput').val();
+              console.log(text);
+              myDataRef.child('channel').child(curField).push({name: name, text: text});
+              $('#messageInput').val('');
+                   }
+          }
+      }); 
+
+
+        //This was a channel thing that Carol and I tried but it wasn't the best option.
+
+      //   function general(){
+
+      //     console.log("button general was clicked")
+      //   }
+
+      //   function south(){
+
+      //     console.log("button south was clicked")
+      //      $('#messageInput').keypress(function (e) {
+      //   if (e.keyCode == 13) {
+      //     //check to see if user is logged in?
+      //     if(!name){
+      //       authModal.modal('show');
+      //     } else { //don't submit anything unless we know the user's name!
+      //     //var name = $('#nameInput').val();
+      //     var stext = $('#messageInput').val();
+      //     console.log(stext);
+      //     myDataRef.child('channel').child('south').push({name: name, text: stext});
+      //     $('#messageInput').val('');
+      //            }
+      //   }
+      // }); 
+
+      //   }
+
+      //   function radioclub(){
+
+      //     console.log("button radioclub was clicked")
+      //     $('#messageInput').keypress(function (e) {
+      //   if (e.keyCode == 13) {
+      //     //check to see if user is logged in?
+      //     if(!name){
+      //       authModal.modal('show');
+      //     } else { //don't submit anything unless we know the user's name!
+      //     //var name = $('#nameInput').val();
+      //     var rtext = $('#messageInput').val();
+      //     console.log(rtext);
+      //     myDataRef.child('channel').child('radioclub').push({name: name, text: rtext});
+      //     $('#messageInput').val('');
+      //            }
+      //   }
+      // }); 
+
+      //   }
+
+      //   function hub(){
+
+      //     console.log("button hub was clicked")
+      //     $('#messageInput').keypress(function (e) {
+      //   if (e.keyCode == 13) {
+      //     //check to see if user is logged in?
+      //     if(!name){
+      //       authModal.modal('show');
+      //     } else { //don't submit anything unless we know the user's name!
+      //     //var name = $('#nameInput').val();
+      //     var htext = $('#messageInput').val();
+      //     console.log(htext);
+      //     myDataRef.child('channel').child('hub').push({name: name, text: htext});
+      //     $('#messageInput').val('');
+      //            }
+      //   }
+      // }); 
+
+      //   }
+
+         function displayNamesUser(userName){
+          $('<div/>').text(userName).appendTo($('#namesDiv'));
+
+         }
+
+         //This got slashed out because it affected messages going into channels. It was copy and pasted and edited somewhere above!!
+
+      // $('#messageInput').keypress(function (e) {
+      //   if (e.keyCode == 13) {
+      //     //check to see if user is logged in?
+      //     if(!name){
+      //       authModal.modal('show');
+      //     } else { //don't submit anything unless we know the user's name!
+      //     //var name = $('#nameInput').val();
+      //     var text = $('#messageInput').val();
+      //     myDataRef.child('messages').push({name: name, text: text});
+      //     $('#messageInput').val('');
+      //            }
+      //   }
+      // }); 
+
 
       
 
@@ -160,15 +270,16 @@
 
          }
 
-      myDataRef.on('child_added', function(snapshot) {
+      myDataRef.child('channel').child(curField).on('child_added', function(snapshot) {
         var message = snapshot.val();
+        console.log(message);
         displayChatMessage(message.name, message.text);
       });
       function displayChatMessage(name, text) {
         $('<div/>').text(text).prepend($('<em/>').text(name+': ')).appendTo($('#messagesDiv'));
         $('#messagesDiv')[0].scrollTop = $('#messagesDiv')[0].scrollHeight;
-      };
-    };
+      }
+    // };
     </script>
   </body>
 </html>
