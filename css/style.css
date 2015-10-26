@@ -20,6 +20,12 @@
 
 .messages{
 	height: 390px;
+	overflow: auto;
+}
+
+/* This lets scrolling happen!! */
+#messagesDiv {
+	overflow: auto;
 }
 
 .modal{
