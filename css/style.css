@@ -1,8 +1,10 @@
 .visit {
-	background-color: #008000;
-	height: 435px;
+	background-color: #194036;
+	height: 600px;
 	color: white;
 	padding: 10px;
+	font-family: Menlo;
+
 }
 
 .fields {
@@ -11,7 +13,24 @@
     font-family: Georgia;
 }
 
-.container {background-color: #D2B48C}
+.container-fluid {
+	background-color: #8C9190;
+	margin-top: 0px;
+
+}
+
+
+
+/*This will push the users bar to the right hand side, if add pull-right to col-xs-2*/
+
+/*.pull-right {
+	float: right !important;
+}*/
+
+/*.visible-xs {
+
+	display: inline-block;
+}*/
 
 .inputbox{
 	width: 80%;
@@ -19,13 +38,26 @@
 }
 
 .messages{
-	height: 390px;
+	height: 550px;
 	overflow: auto;
+	font-family: Menlo;
+	margin-top: 5px;
+}
+
+.logout{
+	height: 400px;
+	margin-left: auto;
+	border-color: #8C9190;
+	width: fixed;
 }
 
 /* This lets scrolling happen!! */
 #messagesDiv {
 	overflow: auto;
+}
+
+#namesDiv {
+	overflow:auto;
 }
 
 .modal{
@@ -35,6 +67,12 @@
 	margin-top: -400px !important;
 	background-color: transparent;
 	width: 50% !important;
+}
+
+.btn-block{
+
+	background-color: #091B00;
+	border-color: #091B00;
 }
 
 .btn-custom {
@@ -48,8 +86,10 @@
   background-image: -webkit-linear-gradient(top, #A9A9A9, #696969);
   background-image: -o-linear-gradient(top, #A9A9A9, #696969);
   background-image: linear-gradient(#A9A9A9, #696969);
-  border-color: #696969 #696969 hsl(82, 100%, 36%);
-  font-family: Helvetica;
+  border-color: #091B00 #091B00;
+  font-family: Menlo;
+  margin-top: 295px;
+  margin-left: 50px
   }
 
   .table {

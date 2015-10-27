@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/js/bootstrap-modal.min.js"></script>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- CSS -->
     <link rel='stylesheet' type='text/css' href='/css/style.css'>
@@ -21,7 +22,7 @@
   </head>
   <body>
 
-    <div class= "container">
+    <div class= "container-fluid">
       <div class= "row">
         <div class= "col-xs-2 visit">
           <p>Channels</p>
@@ -36,7 +37,13 @@
      <button type="button" class="btn btn-success btn-block" onclick="channel('radioclub')">Radio Club</button>
      <button type="button" class="btn btn-success btn-block" onclick="channel('hub')">Hub</button>
 
+
+     <div><a href="javascript:logout();" class="btn btn-custom">Logout</a></div>
+
         </div>
+
+
+
         <div class= "col-xs-10">
          <div class="row">
               <div id='messagesDiv' class="messages"></div>
@@ -50,7 +57,7 @@
       </div>
     </div>
 
-      <div><a href="javascript:logout();">Logout</a></div>
+      
     
 
     <div class="modal fade" id="auth-modal">
@@ -104,7 +111,7 @@
 
        //Check for changes here! I feel a few things were changed in here but I do not remember what
 
-       
+
       function login(provider){
         console.log("login with ", provider);
         authModal.modal('hide');
